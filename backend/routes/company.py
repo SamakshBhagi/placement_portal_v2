@@ -142,3 +142,9 @@ from flask import send_file
 def get_resume(id):
     student = Student.query.get_or_404(id)
     return send_file(student.resume_path, mimetype ="application/pdf")
+
+
+# resumes ranked for the job description provided
+# should show up on drive applicants page
+# flow: for all applicants - > evaluate score- > return sorted list
+# should i keep this as an async task?

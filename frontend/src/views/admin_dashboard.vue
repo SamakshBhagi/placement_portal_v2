@@ -29,7 +29,7 @@
                                 <div class="col-md-3">{{ c.company_name }}</div>
                                 <div class="col-md-3">{{ c.approval }}</div>
                                 <div class="col-md-3"><button class="btn m-2" @click = "toggleCompanyApproval(c)">{{ c.approval=="approved"?"Reject":"Approve"}}</button></div>
-                                <div class="col-md-3"><button class = "btn ms-4" :class="c.is_blacklisted? 'btn-primary':'btn-success'" @click="toggleCompanyBlacklist(c)">{{ c.is_blacklisted? "Unblacklist":"Blacklist" }}</button></div>
+                                <div class="col-md-3"><button class = "btn ms-4" :class="c.is_blacklisted? 'btn-primary':'btn-success'" @click="toggleCompanyBlacklist(c)">{{ c.is_blacklisted? "Whitelist":"Blacklist" }}</button></div>
                             </div>
                             
                         <button class="btn m-2" @click = "prevCompanyPage" :disabled="!companyPagination.hasPrev">Prev</button>
@@ -56,7 +56,7 @@
                                 
                                 <div class="col-md-3">{{ s.approval }}</div>
                                 <div class="col-md-2"><button class="btn m-2" @click = "toggleStudentsApproval(s)">{{ s.approval=="approved"?"Reject":"Approve"}}</button></div>
-                                <div class="col-md-3 "><button class = "btn " :class="s.is_blacklisted ? 'btn-primary': 'btn-success'" @click="toggleStudentBlacklist(s)">{{ s.is_blacklisted? "Unblacklist": "Blacklist" }}</button></div>
+                                <div class="col-md-3 "><button class = "btn " :class="s.is_blacklisted ? 'btn-primary': 'btn-success'" @click="toggleStudentBlacklist(s)">{{ s.is_blacklisted? "Whitelist": "Blacklist" }}</button></div>
                             </div>
                             <button class="btn m-2" @click = "prevStudentPage" :disabled="!studentPagination.hasPrev">Prev</button>
                             <button class="btn m-2" @click="nextStudentPage" :disabled="!studentPagination.hasNext">Next</button>
@@ -100,10 +100,10 @@
                         <div class="card-body">
                             <div class="row fs-4 py-2 border-bottom">
                                 <div class="col-md-2">ID</div>
-                                <div class="col-md-3">Student </div>
-                                <div class="col-md-2">Company</div>
-                                <div class="col-md-3">Date of application</div>
-                                <div class="col-md-2">Status</div>
+                                <div class="col-md-3">STUDENT</div>
+                                <div class="col-md-2">COMPANY</div>
+                                <div class="col-md-3">APPLICATION DATE</div>
+                                <div class="col-md-2">STATUS</div>
                             </div>
                             <div v-for = "a in applications.data"  class = "d-flex justify-content-center align-items-center rounded p-2 mb-2">
                                 <div class="col-md-2">{{ a.application_id }}</div>

@@ -40,7 +40,7 @@ export default{
         },
         viewResume(path){
             console.log(path)
-            window.open(`http://localhost:5000/api/admin/${path}`)
+            window.open(`${import.meta.env.VITE_API_BASE_URL}/api/admin/${path}`)
         }
     },
     mounted(){

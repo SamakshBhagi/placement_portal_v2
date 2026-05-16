@@ -7,10 +7,13 @@ from routes.auth import auth_bp
 from routes.admin import admin_bp
 from routes.company import company_bp
 from routes.student import std_bp
-
+from flask_cors import CORS
+import os
 #factory method here
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 def create():
     app = Flask(__name__ ,static_folder = "exports")
+    CORS(app, origins = [FRONTEND_URL])
     app.config.from_object(Config)
     db.init_app(app)
     migrate.init_app(app,db)

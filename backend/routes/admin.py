@@ -75,6 +75,7 @@ def approve_company(company_id):
     company.approval = "approved"
     data = {"company_id":company.company_id, "company_name": company.company_name, "approval":company.approval}
     db.session.commit()
+    delete_cache("companies:*")
     return respond(message="company approved", 
                 data = data)
 
@@ -85,6 +86,7 @@ def reject_company(company_id):
     company = Company.query.get_or_404(company_id)
     company.approval = "rejected"
     db.session.commit()
+    delete_cache("companies:*")
     return respond(message="company rejected",
                 data = {"company_id":company.company_id, "company_name": company.company_name, "approval":company.approval})
 
@@ -95,6 +97,7 @@ def blacklist_company(company_id):
     company = Company.query.get_or_404(company_id)
     company.is_blacklisted = True
     db.session.commit()
+    delete_cache("companies:*")
     return respond(message="company blacklisted",
                  data = {"company_id":company.company_id, "company_name": company.company_name, "blacklist":company.is_blacklisted})
 
@@ -104,6 +107,8 @@ def unblacklist_company(company_id):
     company = Company.query.get_or_404(company_id)
     company.is_blacklisted = False
     db.session.commit()
+
+    delete_cache("companies:*")
     return respond(message="company unblacklisted", 
                    data = {"company_id":company.company_id, "company_name": company.company_name, "blacklist":company.is_blacklisted})
 
@@ -161,6 +166,7 @@ def approve_student(student_id):
     student.approval = "approved"
     data = {"student_id":student.student_id, "full_name": student.full_name, "approval":student.approval}
     db.session.commit()
+    delete_cache("students:*")
     return respond(message="student approved", 
                 data = data)
 
@@ -171,6 +177,7 @@ def reject_student(student_id):
     student = Student.query.get_or_404(student_id)
     student.approval = "rejected"
     db.session.commit()
+    delete_cache("students:*")
     return respond(message="student rejected",
                 data = {"student_id":student.student_id, "full_name": student.full_name, "approval":student.approval})
 
@@ -181,6 +188,7 @@ def blacklist_student(student_id):
     student = Student.query.get_or_404(student_id)
     student.is_blacklisted = True
     db.session.commit()
+    delete_cache("students:*")
     return respond(message="student blacklisted",
                  data = {"student_id":student.student_id, "full_name": student.full_name, "blacklist":student.is_blacklisted})
 
@@ -190,6 +198,9 @@ def unblacklist_student(student_id):
     student = Student.query.get_or_404(student_id)
     student.is_blacklisted = False
     db.session.commit()
+
+
+    delete_cache("students:*")
     return respond(message="student unblacklisted", 
                    data = {"student_id":student.student_id, "full_name": student.full_name, "blacklist":student.is_blacklisted})
 
@@ -275,6 +286,7 @@ def approve_drive(drive_id):
     drive = Drive.query.get_or_404(drive_id)
     drive.approval = "approved"
     db.session.commit()
+    delete_cache("drives:*")
     return respond(message= " drive approved successfully..")
 
 
@@ -284,6 +296,7 @@ def reject_drive(drive_id):
     drive = Drive.query.get_or_404(drive_id)
     drive.approval = "rejected"
     db.session.commit()
+    delete_cache("drives:*")
     return respond(message= " drive rejected..")
 
 

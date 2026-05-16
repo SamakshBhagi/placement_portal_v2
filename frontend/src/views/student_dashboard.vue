@@ -1,4 +1,5 @@
 <template>
+    <div v-if="!loading">
         <Navbar :student="true" :title ="student.name+`'s`"  @logout = "logout" @history="history" @profile = "profile"/>
         <div class="container m-2 p-4 bg-light">
             <div class="row p-2 g-3 "><div class="fs-4 fw-bold">Ongoing Drives</div></div>
@@ -22,6 +23,8 @@
                 </div>
             </div>
         </div>
+        </div>
+        <div v-else>Loading...</div>
 </template>
 
 <script>
@@ -32,7 +35,7 @@ import api from "../services/api.js"
 export default{
     name:"student_dashboard",
     components:{Navbar},
-    data(){return{drives:{data:[],meta:{}},drivePagination:{page:1,hasNext:false,hasPrev:false},app:[], student:{}}},
+    data(){return{loading:true, drives:{data:[],meta:{}},drivePagination:{page:1,hasNext:false,hasPrev:false},app:[], student:{}}},
     methods:{
         logout(){
             localStorage.removeItem("token")
@@ -48,9 +51,14 @@ export default{
             console.log("Placement history of the student")
         },
         async getStudent(){
-            const res = await api.get(`/api/student/dashboard`)
-            
-            this.student= res.data.data
+            try{
+                const res = await api.get(`/api/student/dashboard`)        
+                this.student= res.data.data
+            }catch(err){
+                console.log(err)
+            }finally{
+                this.loading = false
+            }
         
         },
         async getDrives(){

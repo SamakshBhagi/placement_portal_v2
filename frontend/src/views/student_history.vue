@@ -74,7 +74,7 @@ export default{
                 if(res.data.message=="done!"){
                     clearInterval(interval)
                     const file= res.data.data.file
-                    window.open(`http://localhost:5000/api/student/download_file/${file}`)
+                    window.open(`${import.meta.env.VITE_API_BASE_URL}/api/student/download_file/${file}`)
                 }
             },2000)
         },

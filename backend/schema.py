@@ -55,7 +55,7 @@ class Application(db.Model):
     app_id = db.Column(db.Integer, primary_key =True, index = True)
     student_id = db.Column(db.Integer, db.ForeignKey("student.student_id"), nullable = False, index = True)
     drive_id = db.Column(db.Integer, db.ForeignKey("drive.drive_id"), nullable = False, index = True)
-
+    score = db.Column(db.Integer)
     applied_at = db.Column(db.DateTime, default = lambda: datetime.now(timezone.utc))
     status = db.Column(Enum("applied","shortlisted", "selected", "rejected", name = "application_status"), default = "applied", nullable = False)
     updated_at = db.Column(db.DateTime, default = lambda: datetime.now(timezone.utc))

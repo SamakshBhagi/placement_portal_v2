@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+
+.env
+.env.*
+
+backend/instance/
+backend/*.db
+backend/celerybeat-schedule*
+backend/exports/
+backend/uploads/
+
+frontend/node_modules/
+frontend/dist/
+
+.DS_Store

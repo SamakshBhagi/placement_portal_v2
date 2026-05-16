@@ -1,9 +1,10 @@
 from celery import Celery
 from app import create
-
+import os
+redis_url = os.getenv("REDIS_URL") 
 def make_celery():
     app = create()
-    celery = Celery(app.import_name, broker = "redis://localhost:6379/0", backend ="redis://localhost:6379/0" )
+    celery = Celery(app.import_name, broker = redis_url, backend =redis_url )
     celery.conf.update(app.config)
     from celery.schedules import crontab
 
