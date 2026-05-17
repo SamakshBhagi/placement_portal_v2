@@ -17,6 +17,26 @@ FRONTEND_URLS = [
 ]
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+
+def ensure_admin_user(app):
+    if os.getenv("AUTO_CREATE_ADMIN", "").lower() not in {"1", "true", "yes"}:
+        return
+    if not EMAIL_USER or not EMAIL_PASSWORD:
+        app.logger.warning("AUTO_CREATE_ADMIN is enabled, but EMAIL_USER or EMAIL_PASSWORD is missing.")
+        return
+
+    with app.app_context():
+        admin = User.query.filter_by(role="admin").first()
+        if not admin:
+            admin = User(
+                email=EMAIL_USER,
+                pass_hash=generate_password_hash(EMAIL_PASSWORD),
+                role="admin",
+            )
+            db.session.add(admin)
+            db.session.commit()
+            app.logger.info("Created admin user from environment.")
+
 def create():
     app = Flask(__name__ ,static_folder = "exports")
     CORS(
@@ -28,6 +48,7 @@ def create():
     db.init_app(app)
     migrate.init_app(app,db)
     login_manager.init_app(app)
+    ensure_admin_user(app)
     #my APIs
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
