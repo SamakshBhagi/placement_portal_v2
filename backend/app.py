@@ -10,10 +10,23 @@ from routes.student import std_bp
 from flask_cors import CORS
 import os
 #factory method here
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URLS = [
+    url.strip()
+    for url in os.getenv("FRONTEND_URL", "http://localhost:5173").split(",")
+    if url.strip()
+]
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 def create():
     app = Flask(__name__ ,static_folder = "exports")
-    CORS(app, origins = [FRONTEND_URL])
+    CORS(
+        app,
+        origins=FRONTEND_URLS + [
+            r"https://placement-portal-v2.*\.vercel\.app",
+            r"https://.*\.vercel\.app",
+        ],
+        supports_credentials=True,
+    )
     app.config.from_object(Config)
     db.init_app(app)
     migrate.init_app(app,db)
@@ -34,7 +47,7 @@ def create():
     def create_admin():
         admin = User.query.filter_by(role="admin").first()
         if not admin:
-            admin = User(email ="samaksh.bhagi.dev@gmail.com", pass_hash = generate_password_hash("cdcadmin123"), role = "admin" )
+            admin = User(email = EMAIL_USER, pass_hash = generate_password_hash(EMAIL_PASSWORD), role = "admin" )
             db.session.add(admin)
             db.session.commit()
             print("Created admin")
