@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from config import Config
 from extensions import db, login_manager, migrate
 from schema import *
@@ -15,27 +15,47 @@ FRONTEND_URLS = [
     for url in os.getenv("FRONTEND_URL", "http://localhost:5173").split(",")
     if url.strip()
 ]
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+def admin_credentials():
+    return os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASSWORD")
+
+
+def upsert_admin_user():
+    email, password = admin_credentials()
+    if not email or not password:
+        return False, "EMAIL_USER or EMAIL_PASSWORD is missing"
+
+    db.create_all()
+    admin = User.query.filter_by(role="admin").first()
+    if admin:
+        admin.email = email
+        admin.pass_hash = generate_password_hash(password)
+        message = "Updated admin user from environment."
+    else:
+        admin = User(
+            email=email,
+            pass_hash=generate_password_hash(password),
+            role="admin",
+        )
+        db.session.add(admin)
+        message = "Created admin user from environment."
+
+    db.session.commit()
+    return True, message
 
 def ensure_admin_user(app):
     if os.getenv("AUTO_CREATE_ADMIN", "").lower() not in {"1", "true", "yes"}:
         return
-    if not EMAIL_USER or not EMAIL_PASSWORD:
-        app.logger.warning("AUTO_CREATE_ADMIN is enabled, but EMAIL_USER or EMAIL_PASSWORD is missing.")
-        return
 
     with app.app_context():
-        admin = User.query.filter_by(role="admin").first()
-        if not admin:
-            admin = User(
-                email=EMAIL_USER,
-                pass_hash=generate_password_hash(EMAIL_PASSWORD),
-                role="admin",
-            )
-            db.session.add(admin)
-            db.session.commit()
-            app.logger.info("Created admin user from environment.")
+        try:
+            success, message = upsert_admin_user()
+        except Exception:
+            app.logger.exception("AUTO_CREATE_ADMIN failed.")
+            return
+        if success:
+            app.logger.info(message)
+        else:
+            app.logger.warning("AUTO_CREATE_ADMIN is enabled, but %s.", message)
 
 def create():
     app = Flask(__name__ ,static_folder = "exports")
@@ -61,14 +81,23 @@ def create():
     @app.route("/")
     def landing():
         return "Up and running"
+
+    @app.route("/api/setup/admin", methods=["POST"])
+    def setup_admin():
+        setup_token = os.getenv("SETUP_TOKEN")
+        if not setup_token:
+            return jsonify({"success": False, "message": "Setup endpoint is disabled"}), 404
+        if request.headers.get("X-Setup-Token") != setup_token:
+            return jsonify({"success": False, "message": "Invalid setup token"}), 403
+
+        success, message = upsert_admin_user()
+        status = 200 if success else 400
+        return jsonify({"success": success, "message": message}), status
+
     @app.cli.command("create-admin")
     def create_admin():
-        admin = User.query.filter_by(role="admin").first()
-        if not admin:
-            admin = User(email = EMAIL_USER, pass_hash = generate_password_hash(EMAIL_PASSWORD), role = "admin" )
-            db.session.add(admin)
-            db.session.commit()
-            print("Created admin")
+        success, message = upsert_admin_user()
+        print(message)
 
     @app.cli.command("clean-drives")
     def clean_drives():
