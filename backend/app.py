@@ -21,10 +21,7 @@ def create():
     app = Flask(__name__ ,static_folder = "exports")
     CORS(
         app,
-        origins=FRONTEND_URLS + [
-            r"https://placement-portal-v2.*\.vercel\.app",
-            r"https://.*\.vercel\.app",
-        ],
+        origins=FRONTEND_URLS,
         supports_credentials=True,
     )
     app.config.from_object(Config)
